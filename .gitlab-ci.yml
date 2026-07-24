@@ -1,0 +1,24 @@
+# GitLab CI: lint + build on every push / MR.
+image: node:20
+
+stages:
+  - build
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+    - .next/cache/
+
+build:
+  stage: build
+  script:
+    # Use `npm install` (not `npm ci`) since no package-lock.json is committed.
+    # --legacy-peer-deps avoids strict peer-dependency resolution failures.
+    - npm install --legacy-peer-deps
+    - npm run lint
+    - npm run build
+  artifacts:
+    paths:
+      - .next/
+    expire_in: 1 week

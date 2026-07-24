@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-space-950 text-slate-200 antialiased;
+  /* Prevent horizontal scroll at every viewport */
+  overflow-x: hidden;
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-neon-gradient bg-clip-text text-transparent;
+  }
+  .glass {
+    @apply border border-white/10 bg-white/5 backdrop-blur-xl;
+  }
+  .glow-hover {
+    @apply transition-shadow duration-300 hover:shadow-[0_0_40px_-10px_rgba(139,92,246,0.6)];
+  }
+  /* Minimum 44px tap targets for mobile accessibility */
+  .tap-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
