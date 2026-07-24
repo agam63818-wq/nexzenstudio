@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { Instagram, Youtube, Github, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
+import { InstagramIcon, YoutubeIcon, GithubIcon } from '@/components/ui/brand-icons';
 import { SOCIALS } from '@/lib/nav';
 
-const ICONS = { instagram: Instagram, youtube: Youtube, github: Github, send: Send };
+const ICONS = { instagram: InstagramIcon, youtube: YoutubeIcon, github: GithubIcon, send: Send };
 
 export function Footer() {
   return (

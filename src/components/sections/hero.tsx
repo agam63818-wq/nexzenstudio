@@ -1,11 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { Play, Sparkles, Instagram, Youtube, Github, Send } from 'lucide-react';
+import { Play, Sparkles, Send } from 'lucide-react';
+import { InstagramIcon, YoutubeIcon, GithubIcon } from '@/components/ui/brand-icons';
 import { AdaptiveThree } from '@/components/three/adaptive-three';
 import { SOCIALS } from '@/lib/nav';
 
-const ICONS = { instagram: Instagram, youtube: Youtube, github: Github, send: Send };
+const ICONS = { instagram: InstagramIcon, youtube: YoutubeIcon, github: GithubIcon, send: Send };
 
 const PREVIEW_CARDS = [
   { title: 'AI Prompt Library', desc: '50+ curated prompts' },

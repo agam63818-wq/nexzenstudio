@@ -6,8 +6,8 @@ const nextConfig = {
       { protocol: 'https', hostname: '**.supabase.co' },
     ],
   },
-  // Allow Replit proxy host
-  allowedDevHosts: ['.replit.dev', '.repl.co'],
+  // Allow Replit preview proxy origins
+  allowedDevOrigins: ['*.replit.dev', '*.repl.co', '127.0.0.1'],
 };
 
 export default nextConfig;

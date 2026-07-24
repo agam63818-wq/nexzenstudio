@@ -30,3 +30,7 @@ outputType = "webview"
 
 [userenv.shared]
 NEXT_PUBLIC_SITE_URL = "https://3add40e5-471a-4b1c-a863-2e301978b93e-00-16zt1lflqnp29.sisko.replit.dev"
+
+[[ports]]
+localPort = 5000
+externalPort = 80

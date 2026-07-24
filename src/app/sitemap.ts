@@ -3,6 +3,7 @@ import { SITE_URL } from '@/lib/utils';
 import { NAV_LINKS } from '@/lib/nav';
 import { listPrompts, listGames, listApks, listBlogs } from '@/lib/queries';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

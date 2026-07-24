@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 /**
  * Detects whether the device can comfortably render the full 3D hero.
@@ -8,14 +8,13 @@ import { useEffect, useState } from 'react';
  * disables when the user prefers reduced motion.
  */
 export function useDeviceCapability() {
-  const [tier, setTier] = useState<'high' | 'low'>('low');
-
-  useEffect(() => {
+  const [tier] = useState<'high' | 'low'>(() => {
+    if (typeof window === 'undefined') return 'low';
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const cores = navigator.hardwareConcurrency ?? 4;
     const wide = window.innerWidth >= 768;
-    setTier(!reduce && wide && cores >= 4 ? 'high' : 'low');
-  }, []);
+    return !reduce && wide && cores >= 4 ? 'high' : 'low';
+  });
 
   return tier;
 }

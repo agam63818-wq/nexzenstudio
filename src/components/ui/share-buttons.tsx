@@ -1,6 +1,7 @@
 'use client';
 
-import { Facebook, Linkedin, Send, MessageCircle, Link2, Twitter } from 'lucide-react';
+import { Send, MessageCircle, Link2 } from 'lucide-react';
+import { FacebookIcon, LinkedinIcon, TwitterIcon } from '@/components/ui/brand-icons';
 
 interface Props {
   url: string;
@@ -12,9 +13,9 @@ export function ShareButtons({ url, title = '' }: Props) {
   const e = encodeURIComponent;
   const targets = [
     { label: 'WhatsApp', icon: MessageCircle, href: `https://wa.me/?text=${e(`${title} ${url}`)}` },
-    { label: 'Facebook', icon: Facebook, href: `https://www.facebook.com/sharer/sharer.php?u=${e(url)}` },
-    { label: 'X', icon: Twitter, href: `https://twitter.com/intent/tweet?url=${e(url)}&text=${e(title)}` },
-    { label: 'LinkedIn', icon: Linkedin, href: `https://www.linkedin.com/sharing/share-offsite/?url=${e(url)}` },
+    { label: 'Facebook', icon: FacebookIcon, href: `https://www.facebook.com/sharer/sharer.php?u=${e(url)}` },
+    { label: 'X', icon: TwitterIcon, href: `https://twitter.com/intent/tweet?url=${e(url)}&text=${e(title)}` },
+    { label: 'LinkedIn', icon: LinkedinIcon, href: `https://www.linkedin.com/sharing/share-offsite/?url=${e(url)}` },
     { label: 'Telegram', icon: Send, href: `https://t.me/share/url?url=${e(url)}&text=${e(title)}` },
   ];
 
