@@ -1,20 +1,18 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { Component, type ReactNode } from 'react';
-import { useState } from 'react';
+import { Component, type ReactNode, useState, useEffect } from 'react';
 import { useDeviceCapability } from '@/lib/use-device-capability';
 import { HeroFallback } from './hero-fallback';
 
 // Lazy-load the 3D scene (no SSR) so it never blocks first paint.
 const HeroScene = dynamic(
   () => import('@/components/three/hero-scene').then((m) => m.HeroScene),
-  { ssr: false, loading: () => <HeroFallback /> }
+  { ssr: false, loading: () => null }
 );
 
-/** Probe for a real WebGL context. Returns false in sandboxed/headless envs. */
+/** Probe for a real WebGL context — client-only, never call during SSR. */
 function webGLAvailable(): boolean {
-  if (typeof window === 'undefined') return false;
   try {
     const canvas = document.createElement('canvas');
     return !!(
@@ -45,9 +43,7 @@ class CanvasErrorBoundary extends Component<
   }
 
   render() {
-    if (this.state.error) {
-      return <HeroFallback reason={this.state.error.slice(0, 60)} />;
-    }
+    if (this.state.error) return null; // parent state handles fallback
     return this.props.children;
   }
 }
@@ -55,21 +51,33 @@ class CanvasErrorBoundary extends Component<
 // ---------------------------------------------------------------------------
 // Public component
 // ---------------------------------------------------------------------------
-/** Progressive-enhancement wrapper: only mounts R3F when the device can handle it. */
+type WebGLState = 'pending' | 'available' | 'unavailable';
+
+/**
+ * Progressive-enhancement wrapper: only mounts R3F when the device can handle it.
+ *
+ * SSR + hydration pass always renders HeroFallback ('pending').
+ * After mount, a useEffect probes WebGL and switches to 'available' or 'unavailable'.
+ * This avoids the hydration mismatch that crashes the entire Hero section.
+ */
 export function AdaptiveThree() {
   const tier = useDeviceCapability();
-
-  // Probe on first client render — lazy init runs once, no effect needed.
-  const [hasWebGL] = useState<boolean>(() => webGLAvailable());
+  const [webGL, setWebGL] = useState<WebGLState>('pending');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // No WebGL or already errored → go straight to CSS fallback.
-  if (!hasWebGL || errorMsg) {
-    return <HeroFallback reason={errorMsg ?? 'WebGL unavailable'} />;
+  useEffect(() => {
+    // Runs only on the client, after hydration — safe to probe WebGL here.
+    setWebGL(webGLAvailable() ? 'available' : 'unavailable');
+  }, []);
+
+  // Pending (SSR + first client frame) → show fallback so server/client match.
+  // Unavailable or errored → show fallback permanently.
+  if (webGL !== 'available' || errorMsg) {
+    return <HeroFallback />;
   }
 
   return (
-    <CanvasErrorBoundary onError={setErrorMsg}>
+    <CanvasErrorBoundary onError={(msg) => setErrorMsg(msg)}>
       <div className="relative aspect-square w-full max-w-md">
         {/* Gradient glow (always visible, sole visual on reduced-motion) */}
         <div className="absolute inset-8 rounded-full bg-neon-gradient opacity-30 blur-3xl" />

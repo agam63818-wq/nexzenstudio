@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { PageHeader } from '@/components/ui/page-header';
 
 /** Shared shell for placeholder list routes (filled in later phases). */
 export function PagePlaceholder({
@@ -12,14 +13,15 @@ export function PagePlaceholder({
 }) {
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
-      <h1 className="text-4xl font-black md:text-5xl">
-        <span className="text-gradient">{title}</span>
-      </h1>
-      <p className="mt-3 max-w-2xl text-slate-400">{description}</p>
+      <PageHeader title={title} gradientTitle={title} description={description} />
       {children}
-      <p className="mt-10 rounded-xl border border-dashed border-white/15 p-6 text-sm text-slate-500">
-        Coming soon — this section is database-driven and lands in a later phase.
-      </p>
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-12 text-center">
+        <div className="mb-3 h-12 w-12 rounded-full bg-neon-purple/10 flex items-center justify-center">
+          <span className="text-2xl">🚀</span>
+        </div>
+        <p className="text-sm font-medium text-slate-400">Coming soon</p>
+        <p className="mt-1 text-xs text-slate-600">This section is database-driven and lands in a later phase.</p>
+      </div>
     </section>
   );
 }

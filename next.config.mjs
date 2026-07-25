@@ -7,7 +7,7 @@ const nextConfig = {
     ],
   },
   // Allow Replit preview proxy origins
-  allowedDevOrigins: ['*.replit.dev', '*.repl.co', '127.0.0.1'],
+  allowedDevOrigins: ['*.replit.dev', '*.sisko.replit.dev', '*.repl.co', '127.0.0.1'],
 };
 
 export default nextConfig;

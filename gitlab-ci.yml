@@ -1,0 +1,29 @@
+# GitLab CI: lint + build on every push / MR.
+image: node:22
+
+stages:
+  - build
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .pnpm-store/
+    - .next/cache/
+
+build:
+  stage: build
+  variables:
+    NODE_OPTIONS: "--max-old-space-size=4096"
+  script:
+    # npm crashes with "Exit handler never called!" on these runners,
+    # so use pnpm instead (faster and more resilient).
+    - corepack enable
+    - corepack prepare pnpm@9 --activate
+    - pnpm config set store-dir $CI_PROJECT_DIR/.pnpm-store
+    - pnpm install --no-frozen-lockfile
+    - pnpm run lint
+    - pnpm run build
+  artifacts:
+    paths:
+      - .next/
+    expire_in: 1 week
