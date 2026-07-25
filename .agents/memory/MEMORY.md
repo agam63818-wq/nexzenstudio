@@ -1,0 +1,1 @@
+- [Next.js 16 proxy convention](nextjs16-proxy-convention.md) — middleware.ts deprecated; use proxy.ts with named `proxy` export; having both files causes build error.

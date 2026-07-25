@@ -11,7 +11,7 @@ interface CookieToSet {
  * Protects /admin/* (except the login page). Unauthenticated users, or
  * authenticated users who are not registered admins, are redirected to login.
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Public: the login page itself.

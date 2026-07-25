@@ -1,0 +1,19 @@
+Fix the following issues across the site — prioritize mobile AND desktop, since most traffic is mobile:
+
+1. HERO LAYOUT BUG: The vertical social icon rail (Instagram/YouTube/GitHub/Telegram) in src/components/sections/hero.tsx is absolutely positioned at `left-4` and overlaps the "Build. Create. Inspire." headline text at xl breakpoints. Add `xl:pl-24` to the section's className so the content column clears the rail. Verify no overlap from 1280px up to 4K widths.
+
+2. MAKE THE 3D HERO CLEARLY VISIBLE: The React Three Fiber orb in src/components/three/hero-scene.tsx is too subtle against the dark background — it's barely distinguishable from the CSS glow div behind it. Increase pointLight intensity from 2 to 3.5, move the camera closer (position: [0, 0, 4] instead of [0, 0, 5]), and confirm in the browser console there are no WebGL/module-load errors preventing the canvas from mounting. Test on both desktop (high tier) and a throttled mobile viewport (low tier, wireframe fallback) to confirm both render distinctly.
+
+3. GLASSMORPHISM CARDS LOOK FLAT: The `.glass` utility in globals.css (bg-white/5, border-white/10) is too subtle. Update it to:
+   .glass { @apply border border-white/15 bg-white/[0.07] backdrop-blur-xl shadow-[0_8px_32px_-8px_rgba(139,92,246,0.25)]; }
+   Apply this across all card components (feature cards, prompt cards, gallery cards, admin dashboard cards) for consistent premium depth.
+
+4. HERO BACKGROUND LACKS DEPTH: Add a subtle animated nebula/starfield or radial-gradient-mesh background layer behind the entire hero section (not just around the 3D orb) so it matches the premium reference design — dark space background with soft moving purple/blue glow, low enough opacity/complexity to stay performant on mobile.
+
+5. FIX THE DEPRECATED MIDDLEWARE WARNING in src/middleware.ts before it breaks on the next Next.js upgrade — update it to the currently recommended non-deprecated pattern for this Next.js version, without changing its behavior (it must keep protecting all /admin/* routes except /admin/login, redirecting unauthenticated or non-admin users to /admin/login).
+
+6. CONFIRM ADMIN DASHBOARD IS NOT PUBLICLY VISIBLE: Verify the /admin/(dashboard) routes are only reachable after Supabase auth + admins-table check (already implemented in middleware.ts — just re-verify it still works after the middleware fix above), the admin dashboard is never linked from public nav/sitemap/search, and it's excluded from robots.txt / sitemap.xml so it doesn't get indexed by search engines.
+
+7. FULL MOBILE + DESKTOP PASS: After the above fixes, do a responsive audit — no horizontal scroll at any width, hero reflows cleanly at 375px/768px/1280px, tap targets stay ≥44px, feature/prompt/gallery grids reflow 1→2→3-4 columns, and the 3D canvas complexity stays reduced on low-tier/mobile devices for smooth 60fps scrolling.
+
+Do not touch the Supabase schema or run new migrations — the database schema, RLS policies, and security hardening are already applied directly on the project.

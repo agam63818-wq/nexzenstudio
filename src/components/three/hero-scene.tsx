@@ -16,12 +16,12 @@ export function HeroScene({ tier }: Props) {
 
   return (
     <Canvas
-      camera={{ position: [0, 0, 5], fov: 45 }}
+      camera={{ position: [0, 0, 4], fov: 45 }}
       dpr={tier === 'high' ? [1, 2] : 1}
       gl={{ antialias: tier === 'high' }}
     >
       <ambientLight intensity={0.6} />
-      <pointLight position={[5, 5, 5]} intensity={2} color="#8b5cf6" />
+      <pointLight position={[5, 5, 5]} intensity={3.5} color="#8b5cf6" />
       <pointLight position={[-5, -3, 2]} intensity={1.5} color="#3b82f6" />
 
       <Float speed={2} rotationIntensity={1} floatIntensity={1.5}>

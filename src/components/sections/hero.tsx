@@ -16,7 +16,14 @@ const PREVIEW_CARDS = [
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden px-4 pt-12 md:px-8 md:pt-20">
+    <section className="relative overflow-hidden px-4 pt-12 md:px-8 md:pt-20 xl:pl-24">
+      {/* Animated nebula background — CSS only, GPU-composited, safe on mobile */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="nebula-1 absolute -left-1/4 top-0 h-[600px] w-[600px] rounded-full bg-neon-purple/10 blur-[120px]" />
+        <div className="nebula-2 absolute -right-1/4 top-1/4 h-[500px] w-[500px] rounded-full bg-neon-blue/10 blur-[100px]" />
+        <div className="nebula-3 absolute bottom-0 left-1/3 h-[400px] w-[400px] rounded-full bg-neon-magenta/[0.08] blur-[80px]" />
+      </div>
+
       {/* Desktop-only vertical social rail */}
       <div className="absolute left-4 top-1/2 hidden -translate-y-1/2 flex-col gap-3 xl:flex">
         {SOCIALS.map((s) => {
