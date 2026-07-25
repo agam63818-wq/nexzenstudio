@@ -42,6 +42,16 @@ body {
   }
 }
 
+/* Hero CSS fallback animations */
+@keyframes hero-orb-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-14px); }
+}
+@keyframes hero-ring-spin {
+  from { transform: rotateX(68deg) rotateZ(0deg); }
+  to   { transform: rotateX(68deg) rotateZ(360deg); }
+}
+
 @keyframes nebula-drift-1 {
   0%, 100% { transform: translate(0, 0) scale(1); }
   50%       { transform: translate(40px, -30px) scale(1.1); }
