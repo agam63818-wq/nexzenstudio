@@ -173,6 +173,92 @@ body {
 
   /* Card 3D tilt — applied via JS */
   .tilt-card { transition: transform 0.15s ease-out; }
+
+  /* ── Hero: aurora sweep ─────────────────────────────────────────── */
+  .aurora-sweep {
+    background: linear-gradient(
+      100deg,
+      transparent 10%,
+      rgba(0, 229, 255, 0.10) 30%,
+      rgba(155, 109, 255, 0.14) 50%,
+      rgba(224, 64, 251, 0.10) 70%,
+      transparent 90%
+    );
+    background-size: 200% 100%;
+    filter: blur(40px);
+    animation: aurora-drift 18s ease-in-out infinite;
+    mask-image: linear-gradient(to bottom, black, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+  }
+
+  /* ── Hero: diagonal light streaks ───────────────────────────────── */
+  .light-streak {
+    position: absolute;
+    height: 1px;
+    width: 60%;
+    background: linear-gradient(90deg, transparent, rgba(120, 180, 255, 0.5), transparent);
+    filter: blur(0.5px);
+    opacity: 0.5;
+  }
+  .light-streak-1 {
+    top: 28%;
+    left: -10%;
+    transform: rotate(-18deg);
+    animation: streak-move 9s linear infinite;
+  }
+  .light-streak-2 {
+    top: 62%;
+    left: -10%;
+    width: 45%;
+    transform: rotate(-14deg);
+    background: linear-gradient(90deg, transparent, rgba(200, 120, 255, 0.45), transparent);
+    animation: streak-move 13s linear infinite 2s;
+  }
+
+  /* ── Hero: holographic platform ─────────────────────────────────── */
+  .platform-disc {
+    width: 340px;
+    height: 96px;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(79, 142, 247, 0.55) 0%,
+      rgba(155, 109, 255, 0.3) 40%,
+      transparent 72%
+    );
+    filter: blur(8px);
+    animation: platform-pulse 4.5s ease-in-out infinite;
+  }
+  .platform-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    height: 78px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 1.5px solid rgba(0, 229, 255, 0.55);
+    box-shadow: 0 0 26px rgba(0, 229, 255, 0.4), inset 0 0 20px rgba(0, 229, 255, 0.15);
+    animation: platform-spin 10s linear infinite;
+  }
+  .platform-glow {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    width: 220px;
+    height: 220px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 229, 255, 0.22), transparent 65%);
+    filter: blur(24px);
+    animation: platform-pulse 4.5s ease-in-out infinite 0.6s;
+  }
+
+  @media (max-width: 640px) {
+    .platform-disc { width: 220px; height: 66px; }
+    .platform-ring { width: 200px; height: 54px; }
+    .platform-glow { width: 150px; height: 150px; }
+  }
 }
 
 /* ─── Keyframes (referenced by Tailwind animation utilities) ─────────────── */
@@ -249,6 +335,39 @@ body {
 @keyframes nav-slide-down {
   from { opacity: 0; transform: translateY(-8px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Hero rebuild keyframes ──────────────────────────────────────────────── */
+@keyframes portrait-float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-16px); }
+}
+
+@keyframes card-levitate {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%       { transform: translateY(-12px) rotate(0.6deg); }
+}
+
+@keyframes aurora-drift {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
+@keyframes streak-move {
+  0%   { transform: translateX(-30%) rotate(-18deg); opacity: 0; }
+  15%  { opacity: 0.6; }
+  85%  { opacity: 0.6; }
+  100% { transform: translateX(160%) rotate(-18deg); opacity: 0; }
+}
+
+@keyframes platform-pulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.05); }
+}
+
+@keyframes platform-spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 /* ─── Reduced motion ─────────────────────────────────────────────────────── */
