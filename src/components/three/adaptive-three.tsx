@@ -49,39 +49,43 @@ class CanvasErrorBoundary extends Component<
 }
 
 // ---------------------------------------------------------------------------
-// Public component
+// Public component — renders as an absolute-fill background layer.
 // ---------------------------------------------------------------------------
 type WebGLState = 'pending' | 'available' | 'unavailable';
 
+interface Props {
+  /** Normalised pointer position, -1..1 on each axis, for camera parallax. */
+  pointer: { x: number; y: number };
+}
+
 /**
  * Progressive-enhancement wrapper: only mounts R3F when the device can handle it.
- *
- * SSR + hydration pass always renders HeroFallback ('pending').
- * After mount, a useEffect probes WebGL and switches to 'available' or 'unavailable'.
- * This avoids the hydration mismatch that crashes the entire Hero section.
+ * SSR + hydration always renders the CSS fallback; after mount it probes WebGL.
  */
-export function AdaptiveThree() {
+export function AdaptiveThree({ pointer }: Props) {
   const tier = useDeviceCapability();
   const [webGL, setWebGL] = useState<WebGLState>('pending');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    // Runs only on the client, after hydration — safe to probe WebGL here.
+    // Probe WebGL only after mount so the SSR/first-client render both show the
+    // fallback (avoids a hydration mismatch). setState here is intentional.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setWebGL(webGLAvailable() ? 'available' : 'unavailable');
   }, []);
 
-  // Pending (SSR + first client frame) → show fallback so server/client match.
-  // Unavailable or errored → show fallback permanently.
   if (webGL !== 'available' || errorMsg) {
-    return <HeroFallback />;
+    return (
+      <div className="absolute inset-0 flex items-center justify-center">
+        <HeroFallback />
+      </div>
+    );
   }
 
   return (
     <CanvasErrorBoundary onError={(msg) => setErrorMsg(msg)}>
-      <div className="relative aspect-square w-full max-w-md">
-        {/* Gradient glow (always visible, sole visual on reduced-motion) */}
-        <div className="absolute inset-8 rounded-full bg-neon-gradient opacity-30 blur-3xl" />
-        <HeroScene tier={tier} />
+      <div className="absolute inset-0">
+        <HeroScene tier={tier} pointer={pointer} />
       </div>
     </CanvasErrorBoundary>
   );
