@@ -8,8 +8,8 @@ export default function Page() {
       { name: 'title', label: 'Title' },
       { name: 'media_url', label: 'Media URL', type: 'url' },
       { name: 'media_type', label: 'Media type' },
-      { name: 'width', label: 'Width' },
-      { name: 'height', label: 'Height' },
+      { name: 'width', label: 'Width', type: 'number' },
+      { name: 'height', label: 'Height', type: 'number' },
     ]} />
   );
 }

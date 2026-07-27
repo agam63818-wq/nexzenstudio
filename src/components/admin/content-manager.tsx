@@ -4,7 +4,7 @@ import { ContentManagerClient } from './content-manager-client';
 export interface Field {
   name: string;
   label: string;
-  type?: 'text' | 'textarea' | 'url' | 'select';
+  type?: 'text' | 'textarea' | 'url' | 'select' | 'number';
   options?: { label: string; value: string }[];
 }
 

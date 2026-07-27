@@ -12,7 +12,13 @@ interface Props {
   hasStatus: boolean;
 }
 
+interface FieldControlProps {
+  field: Field;
+  value: string;
+}
+
 const initialState: ActionResult = { ok: false };
+const inputClassName = 'rounded-lg bg-black/30 px-3 py-2 text-sm text-white outline-none placeholder:text-slate-500';
 
 function valueForInput(value: unknown) {
   if (Array.isArray(value)) return value.join(', ');
@@ -26,6 +32,34 @@ function Toast({ toast }: { toast: ActionResult | null }) {
     <div className={`fixed right-4 top-4 z-50 max-w-sm rounded-xl border px-4 py-3 text-sm shadow-xl ${toast.ok ? 'border-emerald-400/40 bg-emerald-950/90 text-emerald-100' : 'border-red-400/40 bg-red-950/90 text-red-100'}`}>
       {toast.message}
     </div>
+  );
+}
+
+function FieldControl({ field, value }: FieldControlProps) {
+  if (field.type === 'select') {
+    return (
+      <select key={field.name} name={field.name} defaultValue={value} className={inputClassName}>
+        <option value="">{field.label}</option>
+        {(field.options ?? []).map((option) => (
+          <option key={option.value} value={option.value}>{option.label}</option>
+        ))}
+      </select>
+    );
+  }
+
+  if (field.type === 'textarea') {
+    return <textarea key={field.name} name={field.name} defaultValue={value} placeholder={field.label} rows={4} className={inputClassName} />;
+  }
+
+  return (
+    <input
+      key={field.name}
+      name={field.name}
+      defaultValue={value}
+      type={field.type === 'url' || field.type === 'number' ? field.type : 'text'}
+      placeholder={field.label}
+      className={inputClassName}
+    />
   );
 }
 
@@ -62,6 +96,11 @@ export function ContentManagerClient({ table, fields, rows, titleKey, hasStatus 
     });
   }
 
+  function confirmAndDelete(id: string) {
+    if (!window.confirm('Delete this row permanently?')) return;
+    runAction(() => deleteRow(table, id));
+  }
+
   const formKey = useMemo(() => (editingId ? `edit-${editingId}` : 'create'), [editingId]);
 
   return (
@@ -74,24 +113,9 @@ export function ContentManagerClient({ table, fields, rows, titleKey, hasStatus 
           </div>
         )}
         {editingId && <input type="hidden" name="id" value={editingId} />}
-        {fields.map((f) => {
-          const defaultValue = valueForInput(editingRow?.[f.name]);
-          if (f.type === 'select') {
-            return (
-              <select key={f.name} name={f.name} defaultValue={defaultValue} className="rounded-lg bg-black/30 px-3 py-2 text-sm text-white outline-none">
-                <option value="">{f.label}</option>
-                {(f.options ?? []).map((option) => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
-                ))}
-              </select>
-            );
-          }
-          return f.type === 'textarea' ? (
-            <textarea key={f.name} name={f.name} defaultValue={defaultValue} placeholder={f.label} rows={4} className="rounded-lg bg-black/30 px-3 py-2 text-sm text-white outline-none placeholder:text-slate-500" />
-          ) : (
-            <input key={f.name} name={f.name} defaultValue={defaultValue} type={f.type === 'url' ? 'url' : 'text'} placeholder={f.label} className="rounded-lg bg-black/30 px-3 py-2 text-sm text-white outline-none placeholder:text-slate-500" />
-          );
-        })}
+        {fields.map((field) => (
+          <FieldControl key={field.name} field={field} value={valueForInput(editingRow?.[field.name])} />
+        ))}
         <div className="flex flex-wrap gap-2">
           <button disabled={isPending} className="tap-target justify-self-start rounded-lg bg-neon-gradient px-5 text-sm font-semibold text-white disabled:opacity-60">{buttonText}</button>
           {editingRow && (
@@ -117,7 +141,7 @@ export function ContentManagerClient({ table, fields, rows, titleKey, hasStatus 
                 )}
                 <button onClick={() => { setEditingRow(r); setFormState(initialState); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="tap-target rounded-lg border border-white/15 px-3 text-xs text-white hover:bg-white/10">Edit</button>
                 <button disabled={isPending} onClick={() => runAction(() => duplicateRow(table, id))} className="tap-target rounded-lg border border-white/15 px-3 text-xs text-white hover:bg-white/10 disabled:opacity-60">Duplicate</button>
-                <button disabled={isPending} onClick={() => runAction(() => deleteRow(table, id))} className="tap-target rounded-lg border border-red-500/30 px-3 text-xs text-red-300 hover:bg-red-500/10 disabled:opacity-60">Delete</button>
+                <button disabled={isPending} onClick={() => confirmAndDelete(id)} className="tap-target rounded-lg border border-red-500/30 px-3 text-xs text-red-300 hover:bg-red-500/10 disabled:opacity-60">Delete</button>
               </div>
             </div>
           );

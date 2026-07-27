@@ -12,6 +12,28 @@ function slugify(input: string) {
   return input.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
+const ALLOWED_TABLES = new Set([
+  'prompts',
+  'image_prompts',
+  'video_prompts',
+  'games',
+  'apks',
+  'blogs',
+  'resources',
+  'categories',
+  'tags',
+  'tools',
+  'gallery',
+  'comments',
+  'settings',
+]);
+
+function assertAllowedTable(table: string) {
+  if (!ALLOWED_TABLES.has(table)) {
+    throw new Error(`Table ${table} is not managed by the admin CMS.`);
+  }
+}
+
 function errorMessage(error: unknown) {
   if (error && typeof error === 'object' && 'message' in error) return String(error.message);
   if (error instanceof Error) return error.message;
@@ -27,6 +49,7 @@ async function getSupabase() {
 
 export async function saveRow(table: string, formData: FormData): Promise<ActionResult> {
   try {
+    assertAllowedTable(table);
     const supabase = await getSupabase();
     const id = formData.get('id') as string | null;
 
@@ -61,6 +84,7 @@ export async function saveRow(table: string, formData: FormData): Promise<Action
 
 export async function deleteRow(table: string, id: string): Promise<ActionResult> {
   try {
+    assertAllowedTable(table);
     const supabase = await getSupabase();
     const { error } = await supabase.from(table).delete().eq('id', id);
     if (error) throw error;
@@ -74,6 +98,7 @@ export async function deleteRow(table: string, id: string): Promise<ActionResult
 
 export async function setStatus(table: string, id: string, status: string): Promise<ActionResult> {
   try {
+    assertAllowedTable(table);
     const supabase = await getSupabase();
     const patch: Record<string, unknown> = { status };
     if (status === 'published') patch.published_at = new Date().toISOString();
@@ -89,6 +114,7 @@ export async function setStatus(table: string, id: string, status: string): Prom
 
 export async function duplicateRow(table: string, id: string): Promise<ActionResult> {
   try {
+    assertAllowedTable(table);
     const supabase = await getSupabase();
     const { data, error: selectError } = await supabase.from(table).select('*').eq('id', id).maybeSingle();
     if (selectError) throw selectError;

@@ -10,7 +10,7 @@ export default function Page() {
       { name: 'category', label: 'Category' },
       { name: 'pricing', label: 'Pricing' },
       { name: 'review', label: 'Review', type: 'textarea' },
-      { name: 'rating', label: 'Rating' },
+      { name: 'rating', label: 'Rating', type: 'number' },
     ]} />
   );
 }
