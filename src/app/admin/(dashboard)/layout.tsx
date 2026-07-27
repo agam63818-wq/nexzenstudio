@@ -16,6 +16,8 @@ import {
   HardDrive,
   Settings,
   LogOut,
+  Wrench,
+  Images,
 } from 'lucide-react';
 import { signOut } from '@/app/admin/actions';
 
@@ -27,6 +29,8 @@ const ITEMS = [
   { href: '/admin/games', label: 'Games', Icon: Gamepad2 },
   { href: '/admin/apks', label: 'APK', Icon: Package },
   { href: '/admin/blogs', label: 'Blogs', Icon: BookOpen },
+  { href: '/admin/tools', label: 'Tools', Icon: Wrench },
+  { href: '/admin/gallery', label: 'Gallery', Icon: Images },
   { href: '/admin/categories', label: 'Categories', Icon: FolderTree },
   { href: '/admin/tags', label: 'Tags', Icon: Tags },
   { href: '/admin/comments', label: 'Comments', Icon: MessageSquare },
