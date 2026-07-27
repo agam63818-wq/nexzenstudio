@@ -14,7 +14,7 @@ export default async function SettingsPage() {
   return (
     <section>
       <h1 className="text-2xl font-bold text-white">Settings</h1>
-      <form action={saveRow.bind(null, 'settings')} className="mt-6 grid gap-3 rounded-2xl glass p-5">
+      <form action={async (formData) => { 'use server'; await saveRow('settings', formData); }} className="mt-6 grid gap-3 rounded-2xl glass p-5">
         <input type="hidden" name="id" value="1" />
         <input name="site_name" defaultValue={String(settings.site_name ?? 'NexZen Studio')} placeholder="Site name" className="rounded-lg bg-black/30 px-3 py-2 text-sm text-white outline-none" />
         <input name="logo_url" defaultValue={String(settings.logo_url ?? '')} placeholder="Logo URL" className="rounded-lg bg-black/30 px-3 py-2 text-sm text-white outline-none" />
