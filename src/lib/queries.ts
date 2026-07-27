@@ -8,6 +8,7 @@ import type {
   Blog,
   Resource,
   Tool,
+  Category,
 } from '@/lib/types';
 
 /**
@@ -24,7 +25,7 @@ function hasEnv() {
   );
 }
 
-export async function listPrompts(tool?: string): Promise<Prompt[]> {
+export async function listPrompts(tool?: string, categoryId?: string): Promise<Prompt[]> {
   if (!hasEnv()) return [];
   const supabase = await createClient();
   let q = supabase
@@ -33,6 +34,7 @@ export async function listPrompts(tool?: string): Promise<Prompt[]> {
     .eq('status', 'published')
     .order('published_at', { ascending: false });
   if (tool) q = q.eq('tool', tool);
+  if (categoryId) q = q.eq('category_id', categoryId);
   const { data } = await q;
   return (data as Prompt[]) ?? [];
 }
@@ -94,14 +96,37 @@ async function getBySlug<T>(table: string, slug: string): Promise<T | null> {
 
 export const listImagePrompts = () => listPublished<ImagePrompt>('image_prompts');
 export const listVideoPrompts = () => listPublished<VideoPrompt>('video_prompts');
-export const listGames = () => listPublished<Game>('games');
+export async function listGames(categoryId?: string): Promise<Game[]> {
+  if (!hasEnv()) return [];
+  const supabase = await createClient();
+  let q = supabase.from('games').select('*').eq('status', 'published').order('created_at', { ascending: false });
+  if (categoryId) q = q.eq('category_id', categoryId);
+  const { data } = await q;
+  return (data as Game[]) ?? [];
+}
 export const getGame = (slug: string) => getBySlug<Game>('games', slug);
-export const listApks = () => listPublished<Apk>('apks');
+export async function listApks(categoryId?: string): Promise<Apk[]> {
+  if (!hasEnv()) return [];
+  const supabase = await createClient();
+  let q = supabase.from('apks').select('*').eq('status', 'published').order('created_at', { ascending: false });
+  if (categoryId) q = q.eq('category_id', categoryId);
+  const { data } = await q;
+  return (data as Apk[]) ?? [];
+}
 export const getApk = (slug: string) => getBySlug<Apk>('apks', slug);
 export const listBlogs = () => listPublished<Blog>('blogs');
 export const getBlog = (slug: string) => getBySlug<Blog>('blogs', slug);
 export const listResources = () => listPublished<Resource>('resources');
 export const listTools = () => listPublished<Tool>('tools');
+
+export async function listCategories(kind?: string): Promise<Category[]> {
+  if (!hasEnv()) return [];
+  const supabase = await createClient();
+  let q = supabase.from('categories').select('*').order('name');
+  if (kind) q = q.eq('kind', kind);
+  const { data } = await q;
+  return (data as Category[]) ?? [];
+}
 
 export interface SearchHit {
   type: string;
