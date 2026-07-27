@@ -31,11 +31,11 @@ export default async function CommentsPage() {
               <p className="mt-1 text-sm text-slate-300">{String(c.body)}</p>
               <div className="mt-3 flex gap-2">
                 {!(c.approved as boolean) && (
-                  <form action={setStatus.bind(null, 'comments', id, 'published')}>
+                  <form action={async () => { 'use server'; await setStatus('comments', id, 'published'); }}>
                     <button className="tap-target rounded-lg border border-white/15 px-3 text-xs text-white hover:bg-white/10">Approve</button>
                   </form>
                 )}
-                <form action={deleteRow.bind(null, 'comments', id)}>
+                <form action={async () => { 'use server'; await deleteRow('comments', id); }}>
                   <button className="tap-target rounded-lg border border-red-500/30 px-3 text-xs text-red-300 hover:bg-red-500/10">Delete</button>
                 </form>
               </div>
