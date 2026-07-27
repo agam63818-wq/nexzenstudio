@@ -61,6 +61,7 @@ export interface Game {
   download_url: string | null;
   trailer_url: string | null;
   screenshots: string[];
+  category_id: string | null;
   status: Status;
   created_at: string;
 }
@@ -77,6 +78,7 @@ export interface Apk {
   whats_new: string | null;
   download_url: string | null;
   virus_scanned: boolean;
+  category_id: string | null;
   status: Status;
   created_at: string;
 }
@@ -114,5 +116,13 @@ export interface Tool {
   review: string | null;
   rating: number | null;
   status: Status;
+  created_at: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  kind: string | null;
   created_at: string;
 }
