@@ -38,6 +38,7 @@ export function ScrollProgress() {
   return (
     <div
       aria-hidden="true"
+      data-nz-sticky
       className="pointer-events-none fixed left-0 top-0 z-[9999] h-[2px] w-full origin-left"
       style={{
         background: 'linear-gradient(90deg, #4f8ef7, #9b6dff, #e040fb)',

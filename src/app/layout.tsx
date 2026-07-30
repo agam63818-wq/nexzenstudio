@@ -4,6 +4,10 @@ import './globals.css';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { ScrollProgress } from '@/components/ui/scroll-progress';
+import {
+  InAppBrowserNotice,
+  HydrationBeacon,
+} from '@/components/layout/in-app-browser-notice';
 import { SITE_URL } from '@/lib/utils';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
@@ -49,6 +53,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <body className="min-h-dvh">
+        {/* Must stay first in <body>: runs before paint, without React. */}
+        <InAppBrowserNotice />
+        <HydrationBeacon />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         <ScrollProgress />
         <Navbar />

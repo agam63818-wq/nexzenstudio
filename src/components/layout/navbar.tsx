@@ -18,6 +18,9 @@ export function Navbar() {
 
   return (
     <header
+      // data-nz-sticky lets the in-app notice bar push the sticky offset down
+      // (see IN_APP_CRITICAL_CSS) instead of overlapping this header.
+      data-nz-sticky
       className={cn(
         'sticky top-0 z-50 w-full transition-all duration-500',
         scrolled
