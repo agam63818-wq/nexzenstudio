@@ -2,6 +2,7 @@ import {
   IN_APP_BOOTSTRAP_SCRIPT,
   IN_APP_CRITICAL_CSS,
   IN_APP_NOTICE_HTML,
+  IN_APP_WIREUP_SCRIPT,
 } from '@/lib/in-app-browser';
 
 /**
@@ -25,6 +26,8 @@ export function InAppBrowserNotice() {
       <style dangerouslySetInnerHTML={{ __html: IN_APP_CRITICAL_CSS }} />
       <script dangerouslySetInnerHTML={{ __html: IN_APP_BOOTSTRAP_SCRIPT }} />
       <div dangerouslySetInnerHTML={{ __html: IN_APP_NOTICE_HTML }} />
+      {/* Must come after the markup above: it wires the elements it reveals. */}
+      <script dangerouslySetInnerHTML={{ __html: IN_APP_WIREUP_SCRIPT }} />
     </>
   );
 }
