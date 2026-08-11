@@ -3,6 +3,14 @@
 @tailwind utilities;
 
 /* ─── Design tokens ──────────────────────────────────────────────────────── */
+
+/* Registered angle so the spinning conic border interpolates smoothly */
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
 :root {
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-display: 'Space Grotesk', system-ui, sans-serif;
@@ -110,6 +118,51 @@ body {
   .glow-purple { box-shadow: 0 0 30px rgba(155,109,255,0.5); }
   .glow-blue   { box-shadow: 0 0 30px rgba(79,142,247,0.5); }
   .glow-magenta{ box-shadow: 0 0 30px rgba(224,64,251,0.5); }
+
+  /* Animated conic-gradient border — spins via --border-angle */
+  .gradient-border-animated {
+    position: relative;
+    background: linear-gradient(180deg, rgba(18, 20, 46, 0.5), rgba(12, 13, 34, 0.6));
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+  .gradient-border-animated::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: conic-gradient(
+      from var(--border-angle),
+      #4f8ef7 0%,
+      #9b6dff 25%,
+      #e040fb 50%,
+      #00e5ff 75%,
+      #4f8ef7 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: border-spin 4s linear infinite;
+    pointer-events: none;
+  }
+
+  /* Pointer-following glare inside the cards */
+  .card-glare {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    background: radial-gradient(
+      220px circle at var(--gx, 50%) var(--gy, 50%),
+      rgba(255, 255, 255, 0.16),
+      transparent 55%
+    );
+  }
+  .group\/card:hover .card-glare { opacity: 1; }
 
   /* Shimmer text */
   .shimmer-text {
@@ -346,6 +399,11 @@ body {
 @keyframes card-levitate {
   0%, 100% { transform: translateY(0) rotate(0deg); }
   50%       { transform: translateY(-12px) rotate(0.6deg); }
+}
+
+@keyframes border-spin {
+  0%   { --border-angle: 0deg; }
+  100% { --border-angle: 360deg; }
 }
 
 @keyframes aurora-drift {

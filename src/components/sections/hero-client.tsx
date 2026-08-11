@@ -32,7 +32,9 @@ const ICONS = { instagram: InstagramIcon, youtube: YoutubeIcon, github: GithubIc
 const BADGE_ITEMS = ['AI', 'Games', 'Apps', 'Automation', 'Resources'];
 
 /* Floating holographic cards that orbit the portrait.
-   `depth` drives parallax strength; `pos` places the card around the stage. */
+   `depth` drives parallax strength; `pos` places the card around the stage.
+   `href` makes the card clickable; `table` shows a live published count.
+   `mobile` gates whether the card shows on small screens (fewer + smaller). */
 type FloatCard = {
   id: string;
   title: string;
@@ -43,6 +45,10 @@ type FloatCard = {
   pos: string;
   depth: number;
   delay: number;
+  href?: string;
+  table?: string;
+  live?: boolean;
+  mobile?: boolean;
 };
 
 const FLOAT_CARDS: FloatCard[] = [
@@ -53,9 +59,13 @@ const FLOAT_CARDS: FloatCard[] = [
     icon: Brain,
     accent: 'from-neon-purple/25 to-neon-blue/10',
     glow: 'shadow-[0_0_40px_-8px_rgba(155,109,255,0.6)]',
-    pos: 'left-[-7%] top-[11%]',
+    pos: 'left-[-6%] top-[12%] sm:left-[-7%] sm:top-[11%]',
     depth: 26,
     delay: 0.9,
+    href: '/prompts',
+    table: 'prompts',
+    live: true,
+    mobile: true,
   },
   {
     id: 'neurozen',
@@ -64,9 +74,11 @@ const FLOAT_CARDS: FloatCard[] = [
     icon: Cpu,
     accent: 'from-neon-magenta/25 to-neon-purple/10',
     glow: 'shadow-[0_0_40px_-8px_rgba(224,64,251,0.6)]',
-    pos: 'right-[-9%] top-[9%]',
+    pos: 'right-[-6%] top-[10%] sm:right-[-9%] sm:top-[9%]',
     depth: 34,
     delay: 1.05,
+    live: true,
+    mobile: true,
   },
   {
     id: 'apk',
@@ -75,9 +87,12 @@ const FLOAT_CARDS: FloatCard[] = [
     icon: Download,
     accent: 'from-neon-blue/25 to-neon-cyan/10',
     glow: 'shadow-[0_0_40px_-8px_rgba(79,142,247,0.6)]',
-    pos: 'right-[-10%] top-[43%]',
+    pos: 'right-[-7%] top-[45%] sm:right-[-10%] sm:top-[43%]',
     depth: 40,
     delay: 1.2,
+    href: '/apks',
+    table: 'apks',
+    mobile: true,
   },
   {
     id: 'games',
@@ -86,9 +101,11 @@ const FLOAT_CARDS: FloatCard[] = [
     icon: Gamepad2,
     accent: 'from-neon-purple/25 to-neon-magenta/10',
     glow: 'shadow-[0_0_40px_-8px_rgba(155,109,255,0.6)]',
-    pos: 'left-[-11%] top-[40%]',
+    pos: 'left-[-9%] top-[42%] sm:left-[-11%] sm:top-[40%]',
     depth: 30,
     delay: 1.35,
+    href: '/games',
+    table: 'games',
   },
   {
     id: 'resources',
@@ -97,9 +114,11 @@ const FLOAT_CARDS: FloatCard[] = [
     icon: Code2,
     accent: 'from-neon-cyan/25 to-neon-blue/10',
     glow: 'shadow-[0_0_40px_-8px_rgba(0,229,255,0.55)]',
-    pos: 'left-[-8%] bottom-[3%]',
+    pos: 'left-[-6%] bottom-[4%] sm:left-[-8%] sm:bottom-[3%]',
     depth: 22,
     delay: 1.5,
+    href: '/resources',
+    table: 'resources',
   },
   {
     id: 'tools',
@@ -108,9 +127,11 @@ const FLOAT_CARDS: FloatCard[] = [
     icon: Bot,
     accent: 'from-neon-blue/25 to-neon-purple/10',
     glow: 'shadow-[0_0_40px_-8px_rgba(79,142,247,0.55)]',
-    pos: 'right-[-5%] bottom-[5%]',
+    pos: 'right-[-4%] bottom-[6%] sm:right-[-5%] sm:bottom-[5%]',
     depth: 36,
     delay: 1.65,
+    href: '/tools',
+    table: 'tools',
   },
 ];
 
@@ -160,23 +181,81 @@ function HoloCard({
   mx,
   my,
   reduce,
+  count,
 }: {
   card: FloatCard;
   mx: MotionValue<number>;
   my: MotionValue<number>;
   reduce: boolean | null;
+  count?: number;
 }) {
   const Icon = card.icon;
   // Parallax offset relative to pointer (opposite direction, scaled by depth)
   const px = useTransform(mx, (v) => -v * card.depth);
   const py = useTransform(my, (v) => -v * card.depth);
-  // 3D tilt from pointer
-  const rotY = useTransform(mx, (v) => v * 10);
-  const rotX = useTransform(my, (v) => -v * 10);
+  // Spring-smoothed 3D tilt + subtle counter-rotation so cards face the camera
+  const tiltX = useSpring(useTransform(my, (v) => -v * 12), { stiffness: 260, damping: 26 });
+  const tiltY = useSpring(useTransform(mx, (v) => v * 12), { stiffness: 260, damping: 26 });
+  const tiltZ = useTransform(mx, (v) => v * 5);
+
+  const glareRef = useRef<HTMLDivElement>(null);
+  const onGlareMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (reduce || !glareRef.current) return;
+      const r = e.currentTarget.getBoundingClientRect();
+      glareRef.current.style.setProperty('--gx', `${((e.clientX - r.left) / r.width) * 100}%`);
+      glareRef.current.style.setProperty('--gy', `${((e.clientY - r.top) / r.height) * 100}%`);
+    },
+    [reduce]
+  );
+
+  const cardInner = (
+    <motion.div
+      onMouseMove={reduce ? undefined : onGlareMove}
+      style={reduce ? {} : { rotateX: tiltX, rotateY: tiltY, rotateZ: tiltZ, transformStyle: 'preserve-3d' }}
+      whileHover={reduce ? {} : { scale: 1.06 }}
+      className={`gradient-border-animated group/card overflow-hidden rounded-2xl bg-gradient-to-br ${card.accent} ${card.glow} p-3 transition-shadow duration-300 hover:shadow-card-hover sm:p-3.5`}
+    >
+      {/* pointer-following glare */}
+      <div className="card-glare" ref={glareRef} />
+      {/* static top sheen */}
+      <div className="pointer-events-none absolute inset-0 rounded-2xl bg-card-shine opacity-60" />
+
+      {/* LIVE badge */}
+      {card.live && (
+        <span className="absolute right-2 top-2 z-10 flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-1.5 py-0.5 backdrop-blur-sm">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)]" />
+          <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-emerald-300">Live</span>
+        </span>
+      )}
+
+      <div className="relative flex items-center gap-2.5">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-white/15 bg-white/10 sm:h-9 sm:w-9">
+          <Icon size={16} className="text-white" />
+        </span>
+        <div className="min-w-0">
+          <p className="truncate text-[13px] font-semibold text-white sm:text-sm">{card.title}</p>
+          <p className="truncate text-[10px] leading-tight text-slate-300/80 sm:text-[11px]">
+            {card.desc}
+          </p>
+        </div>
+      </div>
+
+      {/* live published count */}
+      {typeof count === 'number' && count > 0 && (
+        <div className="relative mt-2 flex items-center justify-between border-t border-white/10 pt-1.5">
+          <span className="font-display text-sm font-black text-gradient">{count}+</span>
+          <span className="text-[9px] uppercase tracking-[0.15em] text-slate-400">
+            {card.table === 'image_prompts' || card.table === 'video_prompts' ? 'Prompts' : card.title}
+          </span>
+        </div>
+      )}
+    </motion.div>
+  );
 
   return (
     <motion.div
-      className={`pointer-events-auto absolute ${card.pos} w-[150px] sm:w-[190px]`}
+      className={`pointer-events-auto absolute ${card.pos} w-[136px] sm:w-[190px] ${card.mobile ? '' : 'hidden sm:block'}`}
       style={reduce ? {} : { x: px, y: py }}
       initial={reduce ? {} : { opacity: 0, scale: 0.6, y: 20 }}
       animate={reduce ? {} : { opacity: 1, scale: 1, y: 0 }}
@@ -186,25 +265,17 @@ function HoloCard({
         className="animate-[card-levitate_var(--dur)_ease-in-out_infinite]"
         style={{ ['--dur' as string]: `${5 + card.depth * 0.06}s` }}
       >
-        <motion.div
-          style={reduce ? {} : { rotateX: rotX, rotateY: rotY, transformStyle: 'preserve-3d' }}
-          whileHover={reduce ? {} : { scale: 1.06 }}
-          className={`gradient-border rounded-2xl bg-gradient-to-br ${card.accent} ${card.glow} p-3 backdrop-blur-xl sm:p-3.5`}
-        >
-          {/* top sheen */}
-          <div className="pointer-events-none absolute inset-0 rounded-2xl bg-card-shine opacity-60" />
-          <div className="relative flex items-center gap-2.5">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-white/15 bg-white/10 sm:h-9 sm:w-9">
-              <Icon size={16} className="text-white" />
-            </span>
-            <div className="min-w-0">
-              <p className="truncate text-[13px] font-semibold text-white sm:text-sm">{card.title}</p>
-              <p className="truncate text-[10px] leading-tight text-slate-300/80 sm:text-[11px]">
-                {card.desc}
-              </p>
-            </div>
-          </div>
-        </motion.div>
+        {card.href ? (
+          <Link
+            href={card.href}
+            aria-label={`${card.title} — ${card.desc}`}
+            className="tap-target flex flex-col justify-center rounded-2xl focus-visible:ring-2 focus-visible:ring-neon-purple focus-visible:ring-offset-2 focus-visible:ring-offset-space-950"
+          >
+            {cardInner}
+          </Link>
+        ) : (
+          <div className="flex flex-col justify-center rounded-2xl">{cardInner}</div>
+        )}
       </motion.div>
     </motion.div>
   );
@@ -213,9 +284,11 @@ function HoloCard({
 export function HeroClient({
   exploreHref,
   workHref,
+  counts,
 }: {
   exploreHref: string;
   workHref: string;
+  counts?: Record<string, number>;
 }) {
   const reduce = useReducedMotion();
   const stageRef = useRef<HTMLDivElement>(null);
@@ -446,7 +519,14 @@ export function HeroClient({
           {/* Floating glass cards (orbit + parallax + tilt) */}
           <div className="pointer-events-none absolute inset-0 z-20">
             {FLOAT_CARDS.map((c) => (
-              <HoloCard key={c.id} card={c} mx={smx} my={smy} reduce={reduce} />
+              <HoloCard
+                key={c.id}
+                card={c}
+                mx={smx}
+                my={smy}
+                reduce={reduce}
+                count={c.table ? counts?.[c.table] : undefined}
+              />
             ))}
           </div>
         </motion.div>

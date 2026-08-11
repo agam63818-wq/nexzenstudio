@@ -53,5 +53,7 @@ export async function Hero() {
     .sort((a, b) => b.count - a.count)[0];
   const workHref = workSection && workSection.count > 0 ? workSection.href : '/gallery';
 
-  return <HeroClient exploreHref={exploreHref} workHref={workHref} />;
+  const countsMap = Object.fromEntries(counts.map((section) => [section.table, section.count]));
+
+  return <HeroClient exploreHref={exploreHref} workHref={workHref} counts={countsMap} />;
 }
