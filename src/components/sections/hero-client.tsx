@@ -101,11 +101,12 @@ const FLOAT_CARDS: FloatCard[] = [
     icon: Gamepad2,
     accent: 'from-neon-purple/25 to-neon-magenta/10',
     glow: 'shadow-[0_0_40px_-8px_rgba(155,109,255,0.6)]',
-    pos: 'left-[-9%] top-[42%] sm:left-[-11%] sm:top-[40%]',
+    pos: 'left-[-7%] top-[44%] sm:left-[-11%] sm:top-[40%]',
     depth: 30,
     delay: 1.35,
     href: '/games',
     table: 'games',
+    mobile: true,
   },
   {
     id: 'resources',
